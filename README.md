@@ -1,6 +1,6 @@
 # 🤖 Clone de Chat com IA (Groq + Flask)
 
-Este projeto é uma aplicação web conversacional desenvolvida com **Python (Flask)** no backend, **JavaScript puro** no frontend e estilizada com **CSS**. A inteligência do chat é alimentada pela **API da Groq** utilizando o modelo `llama-3.3-70b-versatile`.
+Este projeto é uma aplicação web conversacional desenvolvida com **Python (Flask)** no backend, **JavaScript puro** no frontend e estilizada com **CSS**. A inteligência do chat é alimentada pela **API da Groq** utilizando o modelo `openai/gpt-oss-120b`.
 
 O projeto foi projetado com foco didático, priorizando código simples, bem comentado e de fácil compreensão para quem está aprendendo desenvolvimento web com Python.
 

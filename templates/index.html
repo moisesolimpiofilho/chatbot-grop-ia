@@ -3,42 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clone Chat IA</title>
-    <!-- Vincula o arquivo CSS localizado na pasta static -->
+    <title>Chat Simples com Groq</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 </head>
 <body>
 
-    <div class="chat-container">
-        <!-- Cabeçalho do Chat -->
-        <header class="chat-header">
-            <h1>Assistente Virtual IA</h1>
-        </header>
+    <div class="container">
+        <!-- Cabeçalho com título e botão de exportar -->
+        <div class="header">
+            <h1>Chat com IA</h1>
+            <button id="exportar-btn" title="Baixar conversa em PDF">
+                📄 Exportar PDF
+            </button>
+        </div>
 
-        <!-- Área onde as mensagens serão exibidas -->
-        <div id="chat-box" class="chat-box">
-            <div class="message bot">
-                Olá! Como posso ajudar você hoje?
+        <!-- Área do chat com rolagem -->
+        <div id="chat-messages">
+            <div class="mensagem bot">
+                Olá! Sou sua IA assistente. Digite sua pergunta abaixo. 😊
             </div>
         </div>
 
-        <!-- Formulário para envio de perguntas -->
-        <form id="chat-form" class="chat-input-area">
-            <input 
-                type="text" 
-                id="user-input" 
-                placeholder="Digite seu prompt aqui..." 
-                required 
-                autocomplete="off"
-            >
-            <button type="submit" id="send-btn">Enviar</button>
-        </form>
+        <!-- Campo de input e botão -->
+        <div class="input-area">
+            <input type="text" id="prompt-input" placeholder="Digite sua pergunta aqui..." autocomplete="off">
+            <button id="enviar-btn">Enviar</button>
+        </div>
     </div>
 
-    <!-- Biblioteca para converter a resposta da IA (Markdown) em HTML formatado -->
+    <!-- Bibliotecas externas -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
-    <!-- Vincula o arquivo JavaScript localizado na pasta static -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+
     <script src="{{ url_for('static', filename='index.js') }}"></script>
 </body>
 </html>

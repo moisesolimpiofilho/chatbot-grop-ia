@@ -1,114 +1,122 @@
-// Captura dos elementos do DOM
-const chatForm = document.getElementById('chat-form');
-const userInput = document.getElementById('user-input');
-const chatBox = document.getElementById('chat-box');
-const sendBtn = document.getElementById('send-btn');
+document.addEventListener('DOMContentLoaded', () => {
+    const inputElement = document.getElementById('prompt-input');
+    const botaoEnviar = document.getElementById('enviar-btn');
+    const botaoExportar = document.getElementById('exportar-btn');
+    const chatMessages = document.getElementById('chat-messages');
 
-// Escuta o evento de envio do formulário
-chatForm.addEventListener('submit', async (e) => {
-    // Impede o recarregamento padrão da página ao enviar o formulário
-    e.preventDefault();
+    // ===== Adiciona uma mensagem no chat =====
+    function adicionarMensagem(tipo, conteudo, isHTML = false) {
+        const div = document.createElement('div');
+        div.classList.add('mensagem', tipo);
 
-    // Obtém o texto digitado e remove espaços extras no início e no fim
-    const text = userInput.value.trim();
-
-    // Se o campo estiver vazio, interrompe a execução
-    if (!text) return;
-
-    // 1. Exibe a mensagem do usuário na tela
-    appendMessage(text, 'user');
-
-    // Limpa o campo de entrada
-    userInput.value = '';
-
-    // 2. Exibe o indicador de carregamento (loading)
-    const loadingId = appendLoading();
-
-    // Desabilita o botão de enviar enquanto aguarda a resposta
-    sendBtn.disabled = true;
-
-    try {
-        // 3. Faz a requisição POST para a API do Flask
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ prompt: text })
-        });
-
-        const data = await response.json();
-
-        // Remove o balão de carregamento assim que obtém o retorno
-        removeLoading(loadingId);
-
-        if (response.ok) {
-            // Exibe a resposta recebida da IA
-            appendMessage(data.resposta, 'bot');
+        if (isHTML) {
+            div.innerHTML = conteudo;
         } else {
-            // Exibe a mensagem de erro retornada pelo backend
-            appendMessage(`Erro: ${data.erro}`, 'bot');
+            div.textContent = conteudo;
         }
 
-    } catch (error) {
-        // Trata erros de rede ou falha de conexão com o servidor Flask
-        removeLoading(loadingId);
-        appendMessage('Erro ao conectar com o servidor.', 'bot');
-    } finally {
-        // Reabilita o botão de enviar
-        sendBtn.disabled = false;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return div;
     }
+
+    // ===== Indicador "digitando..." =====
+    function mostrarDigitando() {
+        const div = document.createElement('div');
+        div.classList.add('mensagem', 'bot', 'digitando');
+        div.innerHTML = '<span class="ponto"></span><span class="ponto"></span><span class="ponto"></span>';
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return div;
+    }
+
+    // ===== Envia a pergunta =====
+    async function enviarPergunta() {
+        const pergunta = inputElement.value.trim();
+
+        if (!pergunta) {
+            alert('Por favor, digite uma pergunta.');
+            return;
+        }
+
+        adicionarMensagem('user', pergunta);
+        inputElement.value = '';
+        botaoEnviar.disabled = true;
+
+        const digitandoEl = mostrarDigitando();
+
+        try {
+            const response = await fetch('/perguntar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pergunta: pergunta })
+            });
+
+            const data = await response.json();
+            digitandoEl.remove();
+
+            if (!response.ok) {
+                throw new Error(data.erro || 'Erro desconhecido no servidor');
+            }
+
+            const htmlBruto = marked.parse(data.resposta);
+            const htmlSeguro = DOMPurify.sanitize(htmlBruto);
+            adicionarMensagem('bot', htmlSeguro, true);
+
+        } catch (error) {
+            console.error('Erro:', error);
+            digitandoEl.remove();
+            adicionarMensagem('bot', 'Erro: ' + error.message);
+        } finally {
+            botaoEnviar.disabled = false;
+            inputElement.focus();
+        }
+    }
+
+    // ===== Exporta a conversa em PDF =====
+    function exportarPDF() {
+        // 1. Clona a área do chat para não alterar o que está na tela
+        const chatClone = chatMessages.cloneNode(true);
+
+        // 2. Remove o "digitando..." se ainda estiver visível
+        const digitando = chatClone.querySelector('.digitando');
+        if (digitando) digitando.remove();
+
+        // 3. Adiciona cabeçalho com título e data no PDF
+        const agora = new Date().toLocaleString('pt-BR');
+        const cabecalho = document.createElement('div');
+        cabecalho.classList.add('pdf-cabecalho');
+        cabecalho.innerHTML = `
+            <h1>Conversa com IA — Groq</h1>
+            <p>Exportado em: ${agora}</p>
+            <hr>
+        `;
+        chatClone.insertBefore(cabecalho, chatClone.firstChild);
+
+        // 4. Aplica classe especial para o estilo do PDF
+        chatClone.classList.add('pdf-mode');
+
+        // 5. Configurações do PDF
+        const opcoes = {
+            margin:       10,               // margem em mm
+            filename:     'conversa-ia.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } // evita cortar balões
+        };
+
+        // 6. Gera e baixa o PDF
+        html2pdf().set(opcoes).from(chatClone).save();
+    }
+
+    // ===== Eventos =====
+    botaoEnviar.addEventListener('click', enviarPergunta);
+    botaoExportar.addEventListener('click', exportarPDF);
+
+    inputElement.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            enviarPergunta();
+        }
+    });
 });
-
-/**
- * Função responsável por criar e adicionar uma nova mensagem no chat.
- * @param {string} text - O conteúdo da mensagem.
- * @param {string} sender - Quem enviou ('user' ou 'bot').
- */
-function appendMessage(text, sender) {
-    const messageElement = document.createElement('div');
-    messageElement.classList.add('message', sender);
-
-    // Se a mensagem for do bot, converte a sintaxe Markdown para HTML.
-    // Se for do usuário, insere como texto simples para evitar riscos de XSS.
-    if (sender === 'bot') {
-        messageElement.innerHTML = marked.parse(text);
-    } else {
-        messageElement.textContent = text;
-    }
-
-    // Adiciona o elemento na caixa de mensagens
-    chatBox.appendChild(messageElement);
-
-    // Rola a caixa de mensagens para o final para mostrar a mensagem mais recente
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-/**
- * Cria o elemento visual de carregamento (loading).
- * @returns {string} ID único do elemento criado para posterior remoção.
- */
-function appendLoading() {
-    const loadingElement = document.createElement('div');
-    const loadingId = 'loading-' + Date.now();
-    
-    loadingElement.id = loadingId;
-    loadingElement.classList.add('message', 'bot', 'loading');
-    loadingElement.textContent = 'Buscando resposta...';
-
-    chatBox.appendChild(loadingElement);
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    return loadingId;
-}
-
-/**
- * Remove o elemento de carregamento da tela pelo seu ID.
- * @param {string} loadingId - O ID do elemento a ser removido.
- */
-function removeLoading(loadingId) {
-    const loadingElement = document.getElementById(loadingId);
-    if (loadingElement) {
-        loadingElement.remove();
-    }
-}
