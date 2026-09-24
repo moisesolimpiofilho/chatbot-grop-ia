@@ -12,6 +12,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    min-height: 100dvh;   /* respeita a barra do navegador no mobile */
     padding: 20px;
 }
 
@@ -22,13 +23,14 @@ body {
     width: 100%;
     max-width: 800px;
     height: 85vh;
+    height: 85dvh;
     display: flex;
     flex-direction: column;
     padding: 20px;
     gap: 15px;
 }
 
-/* ===== Cabeçalho com título + botão exportar ===== */
+/* ===== Cabeçalho ===== */
 .header {
     display: flex;
     justify-content: space-between;
@@ -73,10 +75,12 @@ body {
 
 /* ===== Balões ===== */
 .mensagem {
+    max-width: 80%;
     padding: 10px 15px;
     border-radius: 12px;
     line-height: 1.5;
     word-wrap: break-word;
+    overflow-wrap: break-word;
     font-size: 15px;
 }
 
@@ -129,9 +133,10 @@ body {
     padding: 12px 15px;
     border: 2px solid #ddd;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 16px;   /* 16px evita zoom automático no iOS */
     outline: none;
     transition: border-color 0.3s;
+    min-width: 0;      /* permite encolher em flex */
 }
 
 #prompt-input:focus {
@@ -147,6 +152,7 @@ body {
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s;
+    white-space: nowrap;
 }
 
 #enviar-btn:hover {
@@ -158,7 +164,7 @@ body {
     cursor: not-allowed;
 }
 
-/* ===== Estilos do Markdown nos balões da IA ===== */
+/* ===== Markdown nos balões da IA ===== */
 .mensagem.bot h1,
 .mensagem.bot h2,
 .mensagem.bot h3 { margin: 10px 0 6px; color: #222; }
@@ -188,6 +194,7 @@ body {
     border-radius: 6px;
     overflow-x: auto;
     margin: 8px 0;
+    max-width: 100%;
 }
 
 .mensagem.bot pre code {
@@ -205,6 +212,7 @@ body {
     border-radius: 0 6px 6px 0;
 }
 
+/* Tabela: permite rolagem horizontal dentro do balão */
 .mensagem.bot table {
     border-collapse: collapse;
     width: 100%;
@@ -220,6 +228,7 @@ body {
     padding: 6px 8px;
     text-align: left;
     vertical-align: top;
+    white-space: nowrap;   /* evita quebra estranha em colunas */
 }
 
 .mensagem.bot th {
@@ -237,8 +246,7 @@ body {
     margin: 12px 0;
 }
 
-/* ===== ESTILO ESPECIAL PARA O PDF ===== */
-/* Aplicado apenas no clone que vai virar PDF */
+/* ===== Estilo do PDF ===== */
 .pdf-mode {
     background: white !important;
     padding: 20px !important;
@@ -246,7 +254,6 @@ body {
     font-size: 12px !important;
 }
 
-/* Cabeçalho no topo do PDF */
 .pdf-cabecalho {
     margin-bottom: 15px;
     padding-bottom: 10px;
@@ -269,13 +276,12 @@ body {
     border-top: 1px solid #ccc;
 }
 
-/* Balões no PDF: sem cores fortes, apenas bordas */
 .pdf-mode .mensagem {
     max-width: 100% !important;
     padding: 10px 12px !important;
     border-radius: 8px !important;
     font-size: 12px !important;
-    page-break-inside: avoid;   /* não corta o balão no meio */
+    page-break-inside: avoid;
     margin-bottom: 10px;
 }
 
@@ -291,11 +297,15 @@ body {
     border: 1px solid #ddd !important;
 }
 
-/* Tabelas e blocos de código no PDF */
 .pdf-mode table {
     font-size: 11px !important;
     width: 100% !important;
     display: table !important;
+}
+
+.pdf-mode th,
+.pdf-mode td {
+    white-space: normal !important;  /* no PDF, deixa quebrar normalmente */
 }
 
 .pdf-mode pre {
@@ -304,4 +314,166 @@ body {
     font-size: 10px !important;
     white-space: pre-wrap !important;
     word-break: break-word !important;
+}
+
+/* ============================================================ */
+/* ===================== RESPONSIVIDADE ======================= */
+/* ============================================================ */
+
+/* ----- Tablets (até 768px) ----- */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        height: 95dvh;
+        max-width: 100%;
+        padding: 15px;
+        gap: 12px;
+        border-radius: 12px;
+    }
+
+    .header h1 {
+        font-size: 19px;
+    }
+
+    #exportar-btn {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    .mensagem {
+        max-width: 88%;
+        font-size: 14px;
+        padding: 9px 13px;
+    }
+
+    #chat-messages {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .input-area {
+        gap: 8px;
+    }
+
+    #prompt-input {
+        padding: 11px 13px;
+        font-size: 16px;
+    }
+
+    #enviar-btn {
+        padding: 11px 18px;
+        font-size: 15px;
+    }
+}
+
+/* ----- Smartphones (até 480px) ----- */
+@media (max-width: 480px) {
+    body {
+        padding: 0;
+        background-color: #fff;
+        align-items: stretch;   /* ocupa a tela toda */
+    }
+
+    .container {
+        height: 100dvh;         /* tela inteira no celular */
+        max-width: 100%;
+        border-radius: 0;       /* sem bordas arredondadas na tela cheia */
+        box-shadow: none;
+        padding: 10px;
+        gap: 10px;
+
+        /* respeita o "notch" e a barra de gestos do iPhone */
+        padding-top:    max(10px, env(safe-area-inset-top));
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+        padding-left:   max(10px, env(safe-area-inset-left));
+        padding-right:  max(10px, env(safe-area-inset-right));
+    }
+
+    .header {
+        gap: 8px;
+    }
+
+    .header h1 {
+        font-size: 17px;
+    }
+
+    /* No celular, só o emoji do botão de PDF aparece */
+    #exportar-btn {
+        padding: 8px 10px;
+        font-size: 16px;
+    }
+
+    #exportar-btn .texto-btn {
+        display: none;
+    }
+
+    #chat-messages {
+        padding: 10px;
+        gap: 8px;
+        border-radius: 10px;
+    }
+
+    /* Balões ocupam quase toda a largura no celular */
+    .mensagem {
+        max-width: 92%;
+        font-size: 14px;
+        padding: 9px 12px;
+        border-radius: 10px;
+    }
+
+    .mensagem.bot h1 { font-size: 17px; }
+    .mensagem.bot h2 { font-size: 15px; }
+    .mensagem.bot h3 { font-size: 14px; }
+
+    /* Tabelas: no celular, com fonte menor e rolagem */
+    .mensagem.bot table {
+        font-size: 12px;
+    }
+
+    .mensagem.bot th,
+    .mensagem.bot td {
+        padding: 5px 6px;
+    }
+
+    /* Bloco de código mais compacto */
+    .mensagem.bot pre {
+        font-size: 11px;
+        padding: 8px;
+    }
+
+    /* Input */
+    .input-area {
+        gap: 6px;
+    }
+
+    #prompt-input {
+        padding: 10px 12px;
+        font-size: 16px;     /* importante p/ iOS não dar zoom */
+        border-radius: 22px; /* arredondado, estilo app */
+    }
+
+    #enviar-btn {
+        padding: 10px 16px;
+        font-size: 15px;
+        border-radius: 22px;
+    }
+}
+
+/* ----- Telas muito estreitas (até 360px) ----- */
+@media (max-width: 360px) {
+    .header h1 {
+        font-size: 15px;
+    }
+
+    #enviar-btn {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .mensagem {
+        font-size: 13px;
+    }
 }
