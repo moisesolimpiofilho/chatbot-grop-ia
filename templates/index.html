@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clone Chat IA</title>
+    <!-- Vincula o arquivo CSS localizado na pasta static -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+<body>
+
+    <div class="chat-container">
+        <!-- Cabeçalho do Chat -->
+        <header class="chat-header">
+            <h1>Assistente Virtual IA</h1>
+        </header>
+
+        <!-- Área onde as mensagens serão exibidas -->
+        <div id="chat-box" class="chat-box">
+            <div class="message bot">
+                Olá! Como posso ajudar você hoje?
+            </div>
+        </div>
+
+        <!-- Formulário para envio de perguntas -->
+        <form id="chat-form" class="chat-input-area">
+            <input 
+                type="text" 
+                id="user-input" 
+                placeholder="Digite seu prompt aqui..." 
+                required 
+                autocomplete="off"
+            >
+            <button type="submit" id="send-btn">Enviar</button>
+        </form>
+    </div>
+
+    <!-- Biblioteca para converter a resposta da IA (Markdown) em HTML formatado -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Vincula o arquivo JavaScript localizado na pasta static -->
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+</body>
+</html>

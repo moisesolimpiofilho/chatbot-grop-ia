@@ -1,0 +1,221 @@
+/* Resets básicos */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Contentor principal do chat */
+.chat-container {
+    width: 100%;
+    max-width: 800px;
+    height: 90vh;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Cabeçalho */
+.chat-header {
+    background-color: #0d6efd;
+    color: #ffffff;
+    padding: 16px 20px;
+    text-align: center;
+}
+
+.chat-header h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+/* Área de conversação / mensagens */
+.chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background-color: #f8f9fa;
+}
+
+/* Estilo geral das bolhas de mensagem */
+.message {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    font-size: 0.95rem;
+}
+
+/* Mensagem enviada pelo utilizador */
+.message.user {
+    align-self: flex-end;
+    background-color: #0d6efd;
+    color: #ffffff;
+    border-bottom-right-radius: 2px;
+}
+
+/* Mensagem gerada pela IA (Bot) */
+.message.bot {
+    align-self: flex-start;
+    background-color: #ffffff;
+    color: #212529;
+    border: 1px solid #e0e0e0;
+    border-bottom-left-radius: 2px;
+}
+
+/* Indicador de carregamento (loading) */
+.message.loading {
+    font-style: italic;
+    color: #6c757d;
+    opacity: 0.8;
+}
+
+/* Área de entrada de texto e botão */
+.chat-input-area {
+    display: flex;
+    padding: 15px;
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    gap: 10px;
+}
+
+.chat-input-area input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.chat-input-area input:focus {
+    border-color: #0d6efd;
+}
+
+.chat-input-area button {
+    padding: 12px 24px;
+    background-color: #0d6efd;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.chat-input-area button:hover {
+    background-color: #0b5ed7;
+}
+
+.chat-input-area button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* =======================================================
+   ESTILOS PARA RENDERIZAÇÃO DO MARKDOWN (RESPOSTAS DA IA)
+   ======================================================= */
+
+.message.bot p {
+    margin-bottom: 8px;
+}
+
+.message.bot p:last-child {
+    margin-bottom: 0;
+}
+
+/* Títulos dentro das respostas */
+.message.bot h1, 
+.message.bot h2, 
+.message.bot h3, 
+.message.bot h4 {
+    margin-top: 12px;
+    margin-bottom: 6px;
+    color: #1a1a1a;
+}
+
+/* Listas ordenadas e não ordenadas */
+.message.bot ul, 
+.message.bot ol {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.message.bot li {
+    margin-bottom: 4px;
+}
+
+/* Tabelas retornadas em Markdown */
+.message.bot table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+    font-size: 0.9rem;
+}
+
+.message.bot th, 
+.message.bot td {
+    border: 1px solid #dee2e6;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.message.bot th {
+    background-color: #e9ecef;
+    font-weight: 600;
+}
+
+.message.bot tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+/* Blocos de citação */
+.message.bot blockquote {
+    border-left: 4px solid #0d6efd;
+    padding-left: 12px;
+    margin: 10px 0;
+    color: #495057;
+    background-color: #f1f3f5;
+    border-radius: 0 4px 4px 0;
+}
+
+/* Blocos e trechos de código */
+.message.bot code {
+    background-color: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.88rem;
+}
+
+.message.bot pre {
+    background-color: #212529;
+    color: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 10px 0;
+}
+
+.message.bot pre code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+}
